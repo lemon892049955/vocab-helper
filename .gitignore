@@ -1,0 +1,22 @@
+node_modules
+dist
+.DS_Store
+*.local
+.env
+.env.*
+!*.example
+
+# WorkBuddy 本地项目数据（记忆/日志），不进 git
+.workbuddy/
+
+# 构建产物：可重新打包生成的安装包
+*.zip
+
+# 测试产物（Playwright 冒烟测试会生成）
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# 日志
+*.log
