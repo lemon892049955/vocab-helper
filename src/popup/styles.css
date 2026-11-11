@@ -48,6 +48,46 @@ body {
   gap: 8px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.gear:hover {
+  background: #f3f4f6;
+  color: #2563eb;
+}
+
+.gear.active {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.gear svg {
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.gear:hover svg {
+  transform: rotate(35deg);
+}
+
 .switch {
   display: inline-flex;
   align-items: center;

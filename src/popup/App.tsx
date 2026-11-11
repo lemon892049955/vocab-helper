@@ -416,17 +416,41 @@ export default function App() {
       <header className="header">
         <div className="brand-row">
           <div className="brand">英语单词学习插件</div>
-          <button
-            type="button"
-            className={settings?.enabled === false ? 'switch off' : 'switch'}
-            onClick={() => void handleToggleEnabled()}
-            title={settings?.enabled === false ? '划词翻译已关闭，点击开启' : '划词翻译已开启，点击关闭'}
-          >
-            <span className="switch-track">
-              <span className="switch-thumb" />
-            </span>
-            <span className="switch-label">{settings?.enabled === false ? '已关闭' : '已开启'}</span>
-          </button>
+          <div className="header-actions">
+            <button
+              type="button"
+              className={settings?.enabled === false ? 'switch off' : 'switch'}
+              onClick={() => void handleToggleEnabled()}
+              title={settings?.enabled === false ? '划词翻译已关闭，点击开启' : '划词翻译已开启，点击关闭'}
+            >
+              <span className="switch-track">
+                <span className="switch-thumb" />
+              </span>
+              <span className="switch-label">{settings?.enabled === false ? '已关闭' : '已开启'}</span>
+            </button>
+            <button
+              type="button"
+              className={tab === 'settings' ? 'gear active' : 'gear'}
+              onClick={() => setTab('settings')}
+              title="设置"
+              aria-label="设置"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </button>
+          </div>
         </div>
         <div className="tabs">
           <button className={tab === 'notes' ? 'tab active' : 'tab'} onClick={() => setTab('notes')}>
@@ -437,12 +461,6 @@ export default function App() {
             onClick={() => setTab('review')}
           >
             复习
-          </button>
-          <button
-            className={tab === 'settings' ? 'tab active' : 'tab'}
-            onClick={() => setTab('settings')}
-          >
-            设置
           </button>
           <button
             className={tab === 'lookup' ? 'tab active' : 'tab'}
