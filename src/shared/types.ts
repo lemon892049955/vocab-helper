@@ -53,6 +53,19 @@ export interface TranslateResult {
   cached: boolean
 }
 
+export interface WordLookupResult {
+  found: boolean
+  original: string
+  source?: 'local' | 'ai'
+  translation?: string
+  phonetic?: string
+  partOfSpeech?: string
+  exampleOriginal?: string
+  exampleTranslation?: string
+  model?: string
+  message?: string
+}
+
 export interface SaveNoteInput {
   type: NoteType
   original: string

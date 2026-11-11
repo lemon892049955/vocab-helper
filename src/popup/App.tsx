@@ -1,11 +1,11 @@
 import type { FormEvent } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ApiResponse, RuntimeMessage, TestConnectionResult } from '../shared/messages'
-import type { AppSettings, Note, ReviewGrade, ReviewStatus, SaveSettingsInput } from '../shared/types'
+import type { AppSettings, Note, ReviewGrade, ReviewStatus, SaveSettingsInput, WordLookupResult } from '../shared/types'
 import { speak } from '../shared/speech'
 import { formatDate, toCsvValue } from '../shared/utils'
 
-type Tab = 'notes' | 'review' | 'settings'
+type Tab = 'notes' | 'review' | 'settings' | 'lookup'
 type NoteFilter = 'all' | Note['type']
 type ReviewFilter = 'all' | ReviewStatus
 
@@ -141,6 +141,10 @@ export default function App() {
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [noteFilter, setNoteFilter] = useState<NoteFilter>('all')
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all')
+  const [lookupInput, setLookupInput] = useState('')
+  const [lookupResult, setLookupResult] = useState<WordLookupResult | null>(null)
+  const [lookupLoading, setLookupLoading] = useState(false)
+  const [lookupSaved, setLookupSaved] = useState(false)
   const [loading, setLoading] = useState(true)
   const [notice, setNotice] = useState('')
 
@@ -265,6 +269,52 @@ export default function App() {
     if (!result.ok) {
       showNotice(result.message)
     }
+  }
+
+  const handleLookup = async () => {
+    const word = lookupInput.trim()
+    if (!word) return
+    setLookupLoading(true)
+    setLookupSaved(false)
+    const response = await sendMessage<WordLookupResult>({ type: 'lookupWord', payload: { word } })
+    if (response?.ok) {
+      setLookupResult(response.data)
+    } else {
+      setLookupResult(null)
+      showNotice(response?.error?.message ?? '查询失败')
+    }
+    setLookupLoading(false)
+  }
+
+  const handleLookupSave = async () => {
+    if (!lookupResult || !lookupResult.found) return
+    const result = lookupResult
+    const response = await sendMessage<{ id: string; updated: boolean }>({
+      type: 'saveNote',
+      payload: {
+        type: 'word',
+        original: result.original,
+        translation: result.translation ?? '',
+        phonetic: result.phonetic,
+        partOfSpeech: result.partOfSpeech,
+        exampleOriginal: result.exampleOriginal,
+        exampleTranslation: result.exampleTranslation,
+        targetLanguage: settings?.targetLanguage ?? '简体中文',
+        model: result.source === 'local' ? 'local' : (result.model ?? 'deepseek-chat'),
+      },
+    })
+    if (response?.ok) {
+      setLookupSaved(true)
+      showNotice(response.data.updated ? '已更新收藏' : '已收藏到生词本')
+    } else {
+      showNotice(response?.error?.message ?? '收藏失败')
+    }
+  }
+
+  const handleLookupSpeak = () => {
+    if (!lookupResult) return
+    const result = speak(lookupResult.original, 'en-US')
+    if (!result.ok) showNotice(result.message)
   }
 
   const handleClearCache = async () => {
@@ -393,6 +443,12 @@ export default function App() {
             onClick={() => setTab('settings')}
           >
             设置
+          </button>
+          <button
+            className={tab === 'lookup' ? 'tab active' : 'tab'}
+            onClick={() => setTab('lookup')}
+          >
+            查词
           </button>
         </div>
       </header>
@@ -628,6 +684,67 @@ export default function App() {
             </div>
           </form>
           {testResult && <div className="test-result">{testResult}</div>}
+        </main>
+      )}
+
+      {tab === 'lookup' && (
+        <main className="body lookup-body">
+          <div className="lookup-bar">
+            <input
+              className="search"
+              type="text"
+              placeholder="输入英文单词查询，如 apple"
+              value={lookupInput}
+              onChange={(event) => {
+                setLookupInput(event.target.value)
+                setLookupSaved(false)
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') void handleLookup()
+              }}
+            />
+            <button className="primary" onClick={() => void handleLookup()} disabled={lookupLoading}>
+              {lookupLoading ? '查询中…' : '查询'}
+            </button>
+          </div>
+
+          {lookupLoading ? (
+            <div className="empty">查询中…</div>
+          ) : !lookupResult ? (
+            <div className="empty">输入单词即可查询释义，支持离线词典与联网翻译。</div>
+          ) : !lookupResult.found ? (
+            <div className="empty">{lookupResult.message ?? '未找到该词的释义。'}</div>
+          ) : (
+            <div className="lookup-card">
+              <div className="note-top">
+                <span className="type type-word">单词</span>
+                {lookupResult.source === 'local' && <span className="lookup-badge">离线词典</span>}
+                <button className="speak" onClick={handleLookupSpeak}>
+                  朗读
+                </button>
+              </div>
+              <div className="note-original">{lookupResult.original}</div>
+              {(lookupResult.phonetic || lookupResult.partOfSpeech) && (
+                <div className="note-meta">
+                  {[lookupResult.phonetic, lookupResult.partOfSpeech].filter(Boolean).join(' · ')}
+                </div>
+              )}
+              <div className="note-translation">{lookupResult.translation}</div>
+              {lookupResult.exampleOriginal && (
+                <div className="note-example">
+                  {lookupResult.exampleOriginal}
+                  {lookupResult.exampleTranslation ? ` — ${lookupResult.exampleTranslation}` : ''}
+                </div>
+              )}
+              <button
+                className="primary lookup-save"
+                onClick={() => void handleLookupSave()}
+                disabled={lookupSaved}
+              >
+                {lookupSaved ? '已收藏' : '收藏到生词本'}
+              </button>
+            </div>
+          )}
         </main>
       )}
     </div>

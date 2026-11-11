@@ -466,6 +466,42 @@ button {
   word-break: break-all;
 }
 
+.lookup-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.lookup-bar .search {
+  flex: 1;
+}
+
+.lookup-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.lookup-card .note-original {
+  font-size: 20px;
+}
+
+.lookup-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.lookup-save {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+}
+
 .toast {
   position: fixed;
   left: 50%;

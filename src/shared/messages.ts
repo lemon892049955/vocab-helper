@@ -4,6 +4,7 @@ import type {
   ReviewGrade,
   ReviewStatus,
   SaveNoteInput,
+  WordLookupResult,
   SaveSettingsInput,
   TranslateInput,
   TranslateResult,
@@ -24,6 +25,7 @@ export type ListNotesPayload = {
 
 export type RuntimeMessage =
   | { type: 'translate'; payload: TranslateInput }
+  | { type: 'lookupWord'; payload: { word: string } }
   | { type: 'saveNote'; payload: SaveNoteInput }
   | { type: 'findNote'; payload: { original: string; type: string } }
   | { type: 'listNotes'; payload: ListNotesPayload }

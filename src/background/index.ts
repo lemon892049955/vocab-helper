@@ -2,6 +2,7 @@ import { fail, fromError, ok } from '../shared/messages'
 import type { ApiResponse, RuntimeMessage } from '../shared/messages'
 import { clearTranslationCache } from './cache'
 import { deleteNote, findNote, getDueNotes, listNotes, reviewNote, saveNote, updateReview } from './notes'
+import { lookupWord } from './lookup'
 import { ProviderError } from './provider/types'
 import { getSettings, saveSettings } from './settings'
 import { translate } from './translate'
@@ -22,6 +23,8 @@ async function handleMessage(message: RuntimeMessage): Promise<ApiResponse<unkno
   switch (message.type) {
     case 'translate':
       return ok(await translate(message.payload))
+    case 'lookupWord':
+      return ok(await lookupWord(message.payload.word))
     case 'saveNote':
       return ok(await saveNote(message.payload))
     case 'findNote':
